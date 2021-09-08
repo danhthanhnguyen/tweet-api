@@ -1,0 +1,4 @@
+# private files
+/node_modules
+/docker-compose/mongodb
+.env
