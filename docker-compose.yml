@@ -1,0 +1,46 @@
+version: "3"
+
+networks:
+  node-app:
+    driver: bridge
+
+volumes:
+  database:
+    driver_opts:
+      device: ./docker-compose/mongodb
+      type: none
+      o: bind
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: node-image
+    container_name: node-app
+    restart: always
+    env_file: .env
+    environment:
+      - MONGO_USERNAME=$MONGO_USERNAME
+      - MONGO_PASSWORD=$MONGO_PASSWORD
+      - MONGO_HOSTNAME=database
+      - MONGO_PORT=$MONGO_PORT
+      - MONGO_DB=$MONGO_DB
+    ports:
+      - 3000:5000
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - node-app
+  database:
+    image: mongo
+    container_name: node-mongo
+    restart: always
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+    volumes:
+      - database:/data/db
+    networks:
+      - node-app
